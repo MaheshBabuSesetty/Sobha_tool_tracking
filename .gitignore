@@ -1,0 +1,85 @@
+# Environment files (NEVER commit these)
+.env
+.env.dev
+.env.uat
+.env.prod
+
+# Keep example file
+!.env.example
+
+# Android signing (NEVER commit these)
+android/key.properties
+android/*.jks
+android/*.keystore
+android/app/*.jks
+android/app/*.keystore
+
+# Firebase config files (NEVER commit these)
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+
+# Flavored Firebase configs
+android/app/src/dev/google-services.json
+android/app/src/uat/google-services.json
+android/app/src/prod/google-services.json
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VSCode related
+.vscode/
+!.vscode/extensions.json
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Coverage reports
+coverage/
+lcov.info
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# macOS
+.DS_Store
+*.swp
+
+# Lock files - keep pubspec.lock for reproducible builds
+# pubspec.lock

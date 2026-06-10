@@ -1,0 +1,12 @@
+// PROD Environment Configuration
+#include "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+
+FLUTTER_BUILD_MODE=release
+FLAVOR=PROD
+APP_NAME=Power Tool Tracking
+APP_BUNDLE_ID=com.company.powertracking
+API_BASE_URL=https://api.company.com
+FIREBASE_PROJECT_ID=power-tool-tracking-prod
+
+PRODUCT_BUNDLE_IDENTIFIER=$(APP_BUNDLE_ID)
+DISPLAY_NAME=$(APP_NAME)

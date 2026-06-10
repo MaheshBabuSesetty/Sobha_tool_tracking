@@ -1,0 +1,9 @@
+#include? "../Pods/Target Support Files/Pods-Runner/Pods-Runner.release-uat.xcconfig"
+#include "../Flutter/Generated.xcconfig"
+
+FLAVOR=uat
+APP_BUNDLE_ID=com.company.powertracking.uat
+APP_NAME=PowerTrack UAT
+API_BASE_URL=https://uat-api.company.com
+FIREBASE_PROJECT_ID=power-tool-tracking-uat
+PRODUCT_BUNDLE_IDENTIFIER=$(APP_BUNDLE_ID)

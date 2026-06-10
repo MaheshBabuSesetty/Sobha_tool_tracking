@@ -1,0 +1,155 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
+// Load signing configuration
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.company.powertracking"
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        dev {
+            res.srcDirs = ['src/dev/res']
+            assets.srcDirs = ['src/dev/assets']
+        }
+        uat {
+            res.srcDirs = ['src/uat/res']
+            assets.srcDirs = ['src/uat/assets']
+        }
+        prod {
+            res.srcDirs = ['src/prod/res']
+            assets.srcDirs = ['src/prod/assets']
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.company.powertracking"
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+        multiDexEnabled true
+
+        // Security
+        manifestPlaceholders = [
+            applicationLabel: "Power Tool Tracking",
+        ]
+    }
+
+    flavorDimensions "environment"
+
+    productFlavors {
+        dev {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            manifestPlaceholders = [applicationLabel: "PowerTrack Dev"]
+            resValue "string", "app_name", "PowerTrack Dev"
+            buildConfigField "String", "FLAVOR", '"DEV"'
+            buildConfigField "String", "BASE_URL", '"https://dev-api.company.com"'
+        }
+
+        uat {
+            dimension "environment"
+            applicationIdSuffix ".uat"
+            versionNameSuffix "-uat"
+            manifestPlaceholders = [applicationLabel: "PowerTrack UAT"]
+            resValue "string", "app_name", "PowerTrack UAT"
+            buildConfigField "String", "FLAVOR", '"UAT"'
+            buildConfigField "String", "BASE_URL", '"https://uat-api.company.com"'
+        }
+
+        prod {
+            dimension "environment"
+            manifestPlaceholders = [applicationLabel: "Power Tool Tracking"]
+            resValue "string", "app_name", "Power Tool Tracking"
+            buildConfigField "String", "FLAVOR", '"PROD"'
+            buildConfigField "String", "BASE_URL", '"https://api.company.com"'
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("${System.properties['user.home']}/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            applicationIdSuffix ""
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+
+        release {
+            debuggable false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Flavor-specific Google Services files
+    applicationVariants.all { variant ->
+        def flavor = variant.productFlavors[0].name
+        variant.outputs.all { output ->
+            outputFileName = "power-tool-tracking-${flavor}-${variant.buildType.name}-${versionName}.apk"
+        }
+    }
+
+    lint {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation platform('com.google.firebase:firebase-bom:33.0.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics'
+}

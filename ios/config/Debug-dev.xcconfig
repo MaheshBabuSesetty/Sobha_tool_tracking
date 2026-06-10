@@ -1,0 +1,9 @@
+#include? "../Pods/Target Support Files/Pods-Runner/Pods-Runner.debug-dev.xcconfig"
+#include "../Flutter/Generated.xcconfig"
+
+FLAVOR=dev
+APP_BUNDLE_ID=com.company.powertracking.dev
+APP_NAME=PowerTrack Dev
+API_BASE_URL=https://dev-api.company.com
+FIREBASE_PROJECT_ID=power-tool-tracking-dev
+PRODUCT_BUNDLE_IDENTIFIER=$(APP_BUNDLE_ID)
