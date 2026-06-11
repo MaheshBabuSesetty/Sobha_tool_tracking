@@ -36,8 +36,22 @@ class SecureStorageService {
   Future<void> saveUserEmail(String email) => _write(StorageKeys.userEmail, email);
   Future<String?> getUserEmail() => _read(StorageKeys.userEmail);
 
+  Future<void> saveUserName(String name) => _write(StorageKeys.userName, name);
+  Future<String?> getUserName() => _read(StorageKeys.userName);
+
   Future<void> saveUserRole(String role) => _write(StorageKeys.userRole, role);
   Future<String?> getUserRole() => _read(StorageKeys.userRole);
+
+  Future<void> saveUserPhone(String phone) => _write(StorageKeys.userPhone, phone);
+  Future<String?> getUserPhone() => _read(StorageKeys.userPhone);
+
+  Future<void> saveUserDesignation(String designation) =>
+      _write(StorageKeys.userDesignation, designation);
+  Future<String?> getUserDesignation() => _read(StorageKeys.userDesignation);
+
+  Future<void> saveUserSiteName(String siteName) =>
+      _write(StorageKeys.userSiteName, siteName);
+  Future<String?> getUserSiteName() => _read(StorageKeys.userSiteName);
 
   Future<void> saveDeviceId(String deviceId) => _write(StorageKeys.deviceId, deviceId);
   Future<String?> getDeviceId() => _read(StorageKeys.deviceId);

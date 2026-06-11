@@ -82,3 +82,19 @@ class UnexpectedFailure extends Failure {
     super.code = 'UNEXPECTED',
   });
 }
+
+class RfidInitializationFailure extends Failure {
+  const RfidInitializationFailure({required super.message, super.code = 'RFID_INIT_ERROR'});
+}
+
+class RfidConnectionFailure extends Failure {
+  const RfidConnectionFailure({required super.message, super.code = 'RFID_CONNECTION_ERROR'});
+}
+
+class RfidScanFailure extends Failure {
+  const RfidScanFailure({required super.message, super.code = 'RFID_SCAN_ERROR'});
+}
+
+class RfidPowerFailure extends Failure {
+  const RfidPowerFailure({required super.message, super.code = 'RFID_POWER_ERROR'});
+}

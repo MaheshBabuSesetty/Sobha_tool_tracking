@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:power_tool_tracking/presentation/blocs/auth/auth_bloc.dart';
-import 'package:power_tool_tracking/presentation/pages/auth/login_page.dart';
-import 'package:power_tool_tracking/presentation/pages/home/home_page.dart';
-import 'package:power_tool_tracking/presentation/pages/splash/splash_page.dart';
-import 'package:power_tool_tracking/presentation/pages/tools/add_edit_tool_page.dart';
-import 'package:power_tool_tracking/presentation/pages/tools/tool_detail_page.dart';
-import 'package:power_tool_tracking/presentation/pages/tools/tools_page.dart';
+import 'package:power_tool_tracking/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:power_tool_tracking/features/auth/presentation/pages/login_page.dart';
+import 'package:power_tool_tracking/features/home/presentation/pages/dashboard_page.dart';
+import 'package:power_tool_tracking/features/home/presentation/pages/home_page.dart';
+import 'package:power_tool_tracking/features/pm/presentation/pages/issue_tool_page.dart';
+import 'package:power_tool_tracking/features/pm/presentation/pages/request_detail_page.dart';
+import 'package:power_tool_tracking/features/profile/presentation/pages/profile_page.dart';
+import 'package:power_tool_tracking/features/auth/presentation/pages/splash_page.dart';
+import 'package:power_tool_tracking/features/tools/presentation/pages/add_edit_tool_page.dart';
+import 'package:power_tool_tracking/features/tools/presentation/pages/tool_detail_page.dart';
+import 'package:power_tool_tracking/features/tools/presentation/pages/tools_page.dart';
 import 'package:power_tool_tracking/presentation/routes/route_names.dart';
 
 class AppRouter {
@@ -23,7 +27,6 @@ class AppRouter {
         initialLocation: RouteNames.splash,
         debugLogDiagnostics: true,
         redirect: _redirect,
-        refreshListenable: GoRouterRefreshStream(authBloc.stream),
         routes: [
           GoRoute(
             path: RouteNames.splash,
@@ -38,6 +41,25 @@ class AppRouter {
           ShellRoute(
             builder: (_, state, child) => HomePage(child: child),
             routes: [
+              GoRoute(
+                path: RouteNames.dashboard,
+                name: 'dashboard',
+                builder: (_, __) => const DashboardPage(),
+              ),
+              GoRoute(
+                path: RouteNames.issueTool,
+                name: 'issue-tool',
+                builder: (_, __) => const IssueToolPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'issue-tool-detail',
+                    builder: (_, state) => RequestDetailPage(
+                      requestId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
               GoRoute(
                 path: RouteNames.tools,
                 name: 'tools',
@@ -67,14 +89,26 @@ class AppRouter {
                 ],
               ),
               GoRoute(
+                path: RouteNames.scan,
+                name: 'scan',
+                builder: (_, __) => const _PlaceholderPage(title: 'Scan'),
+              ),
+              GoRoute(
+                path: RouteNames.profile,
+                name: 'profile',
+                builder: (_, __) => const ProfilePage(),
+              ),
+              GoRoute(
                 path: RouteNames.assignments,
                 name: 'assignments',
-                builder: (_, __) => const _PlaceholderPage(title: 'Assignments'),
+                builder: (_, __) =>
+                    const _PlaceholderPage(title: 'Assignments'),
               ),
               GoRoute(
                 path: RouteNames.maintenance,
                 name: 'maintenance',
-                builder: (_, __) => const _PlaceholderPage(title: 'Maintenance'),
+                builder: (_, __) =>
+                    const _PlaceholderPage(title: 'Maintenance'),
               ),
               GoRoute(
                 path: RouteNames.reports,
@@ -99,26 +133,12 @@ class AppRouter {
 
     if (isSplash) return null;
     if (!isAuthenticated && !isLogin) return RouteNames.login;
-    if (isAuthenticated && isLogin) return RouteNames.tools;
+    if (isAuthenticated && isLogin) return RouteNames.dashboard;
     return null;
   }
 
   void dispose() {
     _router.dispose();
-  }
-}
-
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
-    _sub = stream.listen((_) => notifyListeners());
-  }
-
-  late final dynamic _sub;
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
   }
 }
 
@@ -150,7 +170,7 @@ class _ErrorPage extends StatelessWidget {
               Text(error, style: const TextStyle(color: Colors.grey)),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () => context.go(RouteNames.tools),
+                onPressed: () => context.go(RouteNames.dashboard),
                 child: const Text('Go Home'),
               ),
             ],

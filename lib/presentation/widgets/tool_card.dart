@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:power_tool_tracking/core/extensions/date_time_extensions.dart';
 import 'package:power_tool_tracking/core/theme/app_colors.dart';
-import 'package:power_tool_tracking/domain/entities/tool_entity.dart';
+import 'package:power_tool_tracking/features/tools/domain/entities/tool_entity.dart';
 import 'package:power_tool_tracking/presentation/widgets/status_badge.dart';
 
 class ToolCard extends StatelessWidget {

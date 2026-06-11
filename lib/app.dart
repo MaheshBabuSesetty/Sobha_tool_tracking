@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:power_tool_tracking/core/dependency_injection/service_locator.dart';
 import 'package:power_tool_tracking/core/theme/app_theme.dart';
 import 'package:power_tool_tracking/presentation/blocs/app/app_bloc.dart';
-import 'package:power_tool_tracking/presentation/blocs/auth/auth_bloc.dart';
+import 'package:power_tool_tracking/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:power_tool_tracking/features/pm/presentation/blocs/pm_bloc.dart';
 import 'package:power_tool_tracking/presentation/blocs/theme/theme_bloc.dart';
 import 'package:power_tool_tracking/presentation/routes/app_router.dart';
 
@@ -34,6 +35,7 @@ class _PowerToolTrackingAppState extends State<PowerToolTrackingApp> {
         providers: [
           BlocProvider<AppBloc>(create: (_) => sl<AppBloc>()),
           BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
+          BlocProvider<PmBloc>(create: (_) => sl<PmBloc>()),
           BlocProvider<ThemeBloc>(create: (_) => sl<ThemeBloc>()),
         ],
         child: BlocBuilder<ThemeBloc, ThemeState>(

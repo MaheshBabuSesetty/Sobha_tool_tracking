@@ -4,6 +4,10 @@ class RouteNames {
   static const String splash = '/';
   static const String login = '/login';
   static const String home = '/home';
+  static const String dashboard = '/home/dashboard';
+  static const String scan = '/home/scan';
+  static const String issueTool = '/home/issue-tool';
+  static const String issueToolDetail = '/home/issue-tool/:id';
   static const String tools = '/home/tools';
   static const String toolDetail = '/home/tools/:id';
   static const String addTool = '/home/tools/add';

@@ -6,6 +6,21 @@ class ApiConstants {
   static String get baseUrl => EnvironmentConfig.apiBaseUrl;
   static int get timeoutMs => EnvironmentConfig.apiTimeout;
 
+  // Mobile API base URL
+  static const String mobileBaseUrl = 'http://13.127.111.108';
+
+  // Mobile Auth Endpoints (full paths — used directly via Dio)
+  static const String mobileAuthLogin = '/api/v1/mobile/auth/login';
+  static const String mobileAuthLogout = '/api/v1/mobile/auth/logout';
+
+  // Mobile Auth Endpoints (relative — used via MobileApiClient, which prepends /api/v1)
+  static const String mobileAuthRefresh = '/mobile/auth/refresh';
+
+  // Mobile PM Store Endpoints (relative — used via MobileApiClient)
+  static const String mobilePmRequests = '/mobile/pm/requests';
+  static String mobilePmRequestById(int id) => '/mobile/pm/requests/$id';
+  static const String mobilePmIssue = '/mobile/pm/issue';
+
   // Auth Endpoints
   static const String login = '/api/v1/auth/login';
   static const String logout = '/api/v1/auth/logout';

@@ -125,3 +125,43 @@ class UnexpectedException extends AppException {
     super.stackTrace,
   });
 }
+
+class RfidConnectionException extends RfidException {
+  const RfidConnectionException({
+    required super.message,
+    super.code = 'RFID_CONNECTION_ERROR',
+    super.stackTrace,
+  });
+}
+
+class RfidException extends AppException {
+  const RfidException({
+    required super.message,
+    super.code = 'RFID_ERROR',
+    super.stackTrace,
+  });
+}
+
+class RfidInitializationException extends RfidException {
+  const RfidInitializationException({
+    required super.message,
+    super.code = 'RFID_INIT_ERROR',
+    super.stackTrace,
+  });
+}
+
+class RfidScanException extends RfidException {
+  const RfidScanException({
+    required super.message,
+    super.code = 'RFID_SCAN_ERROR',
+    super.stackTrace,
+  });
+}
+
+class RfidPowerException extends RfidException {
+  const RfidPowerException({
+    required super.message,
+    super.code = 'RFID_POWER_ERROR',
+    super.stackTrace,
+  });
+}

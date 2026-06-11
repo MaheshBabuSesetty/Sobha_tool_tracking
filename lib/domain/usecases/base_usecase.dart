@@ -19,3 +19,8 @@ class NoParams {
   const NoParams();
   static const instance = NoParams();
 }
+
+class IntParams {
+  const IntParams(this.value);
+  final int value;
+}

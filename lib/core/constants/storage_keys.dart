@@ -7,7 +7,11 @@ class StorageKeys {
   static const String tokenExpiry = 'token_expiry';
   static const String userId = 'user_id';
   static const String userEmail = 'user_email';
+  static const String userName = 'user_name';
   static const String userRole = 'user_role';
+  static const String userPhone = 'user_phone';
+  static const String userDesignation = 'user_designation';
+  static const String userSiteName = 'user_site_name';
   static const String deviceId = 'device_id';
   static const String biometricEnabled = 'biometric_enabled';
 

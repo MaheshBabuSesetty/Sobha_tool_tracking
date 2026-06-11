@@ -1,4 +1,4 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+// import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 import 'package:power_tool_tracking/flavors/environment_config.dart';
 
@@ -21,7 +21,7 @@ class AppLogger {
       ),
       output: MultiOutput([
         ConsoleOutput(),
-        if (EnvironmentConfig.isProduction) _CrashlyticsOutput(),
+        // if (EnvironmentConfig.isProduction) _CrashlyticsOutput(),
       ]),
     );
     _initialized = true;
@@ -45,22 +45,22 @@ class AppLogger {
   static void error(dynamic message, [dynamic error, StackTrace? stackTrace]) {
     _ensureInitialized();
     _logger.e(message, error: error, stackTrace: stackTrace);
-    if (EnvironmentConfig.enableCrashlytics && error != null) {
-      FirebaseCrashlytics.instance.recordError(error, stackTrace, reason: message.toString());
-    }
+    // if (EnvironmentConfig.enableCrashlytics && error != null) {
+    //   FirebaseCrashlytics.instance.recordError(error, stackTrace, reason: message.toString());
+    // }
   }
 
   static void fatal(dynamic message, [dynamic error, StackTrace? stackTrace]) {
     _ensureInitialized();
     _logger.f(message, error: error, stackTrace: stackTrace);
-    if (EnvironmentConfig.enableCrashlytics) {
-      FirebaseCrashlytics.instance.recordError(
-        error ?? message,
-        stackTrace,
-        reason: message.toString(),
-        fatal: true,
-      );
-    }
+    // if (EnvironmentConfig.enableCrashlytics) {
+    //   FirebaseCrashlytics.instance.recordError(
+    //     error ?? message,
+    //     stackTrace,
+    //     reason: message.toString(),
+    //     fatal: true,
+    //   );
+    // }
   }
 
   static void apiRequest({
@@ -90,11 +90,11 @@ class AppLogger {
   }
 }
 
-class _CrashlyticsOutput extends LogOutput {
-  @override
-  void output(OutputEvent event) {
-    if (event.level.index >= Level.error.index) {
-      FirebaseCrashlytics.instance.log(event.lines.join('\n'));
-    }
-  }
-}
+// class _CrashlyticsOutput extends LogOutput {
+//   @override
+//   void output(OutputEvent event) {
+//     if (event.level.index >= Level.error.index) {
+//       FirebaseCrashlytics.instance.log(event.lines.join('\n'));
+//     }
+//   }
+// }
