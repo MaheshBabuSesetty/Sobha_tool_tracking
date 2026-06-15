@@ -14,147 +14,134 @@ class IssueToolPage extends StatefulWidget {
 }
 
 class _IssueToolPageState extends State<IssueToolPage> {
+  List<PmRequestEntity>? _requests;
+
   @override
   void initState() {
     super.initState();
-    context.read<PmBloc>().add(const PmRequestsLoadRequested());
+    final bloc = context.read<PmBloc>();
+    final state = bloc.state;
+    if (state is PmRequestsLoaded) {
+      _requests = state.requests;
+    } else {
+      bloc.add(const PmRequestsLoadRequested());
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
-      appBar: AppBar(
-        backgroundColor: AppColors.sidebarBackground,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        centerTitle: true,
-        title: const Text(
-          'Issue Tool Requests',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () =>
-                context.read<PmBloc>().add(const PmRequestsLoadRequested()),
-          ),
-        ],
-      ),
-      body: BlocBuilder<PmBloc, PmState>(
-        buildWhen: (prev, curr) =>
-            curr is PmLoading ||
-            curr is PmRequestsLoaded ||
-            curr is PmError,
-        builder: (context, state) {
-          if (state is PmLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(AppColors.primary),
-              ),
-            );
+  Widget build(BuildContext context) => BlocListener<PmBloc, PmState>(
+        listenWhen: (_, curr) =>
+            curr is PmRequestsLoaded || curr is PmError,
+        listener: (context, state) {
+          if (state is PmRequestsLoaded) {
+            setState(() => _requests = state.requests);
           }
-
-          if (state is PmError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline,
-                      color: AppColors.error, size: 48),
-                  const SizedBox(height: 12),
-                  Text(
-                    state.message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppColors.textSecondary),
+        },
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF2F2F2),
+          appBar: AppBar(
+            backgroundColor: AppColors.sidebarBackground,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            centerTitle: true,
+            title: const Text(
+              'Issue Tool Requests',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                onPressed: () => context
+                    .read<PmBloc>()
+                    .add(const PmRequestsLoadRequested()),
+              ),
+            ],
+          ),
+          body: _requests == null
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(AppColors.primary),
                   ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context
-                        .read<PmBloc>()
-                        .add(const PmRequestsLoadRequested()),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary),
-                    child: const Text('Retry',
-                        style: TextStyle(color: Colors.white)),
+                )
+              : _RequestList(
+                  requests: _requests!,
+                  onRefresh: () => context
+                      .read<PmBloc>()
+                      .add(const PmRequestsLoadRequested()),
+                ),
+        ),
+      );
+}
+
+class _RequestList extends StatelessWidget {
+  const _RequestList({required this.requests, required this.onRefresh});
+
+  final List<PmRequestEntity> requests;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final pendingCount = requests.where((r) => r.isActionable).length;
+    return Column(
+      children: [
+        if (pendingCount > 0)
+          Container(
+            width: double.infinity,
+            color: AppColors.primary,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text:
+                        '$pendingCount Pending Request${pendingCount > 1 ? 's' : ''}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: ' waiting for issue',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
-            );
-          }
-
-          if (state is! PmRequestsLoaded) return const SizedBox.shrink();
-
-          final requests = state.requests;
-          final pendingCount =
-              requests.where((r) => r.isActionable).length;
-
-          return Column(
-            children: [
-              // ── Pending banner ───────────────────────────────────────
-              if (pendingCount > 0)
-                Container(
-                  width: double.infinity,
-                  color: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 14),
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '$pendingCount Pending Request${pendingCount > 1 ? 's' : ''}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const TextSpan(
-                          text: ' waiting for issue',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+            ),
+          ),
+        Expanded(
+          child: requests.isEmpty
+              ? const Center(
+                  child: Text(
+                    'No pending requests',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: requests.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) => _RequestCard(
+                    request: requests[index],
+                    onTap: () => context.push(
+                      '/home/issue-tool/${requests[index].id}',
                     ),
                   ),
                 ),
-
-              // ── Request list ─────────────────────────────────────────
-              Expanded(
-                child: requests.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No pending requests',
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: requests.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) => _RequestCard(
-                          request: requests[index],
-                          onTap: () => context.push(
-                            '/home/issue-tool/${requests[index].id}',
-                          ),
-                        ),
-                      ),
-              ),
-            ],
-          );
-        },
-      ),
+        ),
+      ],
     );
   }
 }

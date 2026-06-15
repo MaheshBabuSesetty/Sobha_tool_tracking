@@ -23,7 +23,7 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: const Color(0xFFF2F2F2),
         appBar: AppBar(
           backgroundColor: AppColors.sidebarBackground,
           elevation: 0,
@@ -42,7 +42,7 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
             final count =
                 state is ReceiveToolListLoaded ? state.items.length : null;
             return Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -50,20 +50,22 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
                   const Text(
                     'Quick Actions',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondaryDark,
-                      letterSpacing: 0.5,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  _DashboardCard(
+                  const SizedBox(height: 16),
+                  _ActionCard(
                     icon: Icons.move_to_inbox_rounded,
                     title: 'Receive Tool',
                     subtitle: 'Accept returned tools from site',
-                    badge: (count != null && count > 0)
-                        ? '$count pending'
-                        : null,
+                    backgroundColor: AppColors.primary,
+                    iconBackgroundColor: Colors.white.withValues(alpha: 0.25),
+                    iconColor: Colors.white,
+                    titleColor: Colors.white,
+                    subtitleColor: Colors.white.withValues(alpha: 0.85),
+                    badge: (count != null && count > 0) ? count : null,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -81,11 +83,17 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
                           .add(const ReceiveToolListLoadRequested());
                     }),
                   ),
-                  const SizedBox(height: 12),
-                  _DashboardCard(
+                  const SizedBox(height: 14),
+                  _ActionCard(
                     icon: Icons.history_rounded,
                     title: 'Tool History',
                     subtitle: 'View past movements and transactions',
+                    backgroundColor: Colors.white,
+                    iconBackgroundColor:
+                        AppColors.primary.withValues(alpha: 0.12),
+                    iconColor: AppColors.primary,
+                    titleColor: AppColors.textPrimary,
+                    subtitleColor: AppColors.textSecondary,
                     onTap: () {},
                   ),
                 ],
@@ -96,11 +104,16 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
       );
 }
 
-class _DashboardCard extends StatelessWidget {
-  const _DashboardCard({
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({
     required this.icon,
     required this.title,
     required this.subtitle,
+    required this.backgroundColor,
+    required this.iconBackgroundColor,
+    required this.iconColor,
+    required this.titleColor,
+    required this.subtitleColor,
     required this.onTap,
     this.badge,
   });
@@ -108,85 +121,78 @@ class _DashboardCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final Color backgroundColor;
+  final Color iconBackgroundColor;
+  final Color iconColor;
+  final Color titleColor;
+  final Color subtitleColor;
   final VoidCallback onTap;
-  final String? badge;
+  final int? badge;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceDark,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.dividerDark),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+  Widget build(BuildContext context) => Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 26),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 26),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: titleColor,
                         ),
-                        if (badge != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              badge!,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.onPrimary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: subtitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (badge != null)
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$badge',
                       style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondaryDark,
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textSecondaryDark,
-              ),
-            ],
+                  ),
+              ],
+            ),
           ),
         ),
       );

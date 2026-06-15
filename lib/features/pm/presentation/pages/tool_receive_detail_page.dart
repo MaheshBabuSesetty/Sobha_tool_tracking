@@ -14,12 +14,12 @@ class ToolReceiveDetailPage extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           'Confirm Receipt',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -27,7 +27,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
         content: Text(
           'Are you sure you want to confirm receipt of "${tool.toolName}"?',
           style: const TextStyle(
-            color: AppColors.textSecondaryDark,
+            color: AppColors.textSecondary,
             fontSize: 14,
             height: 1.5,
           ),
@@ -37,7 +37,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text(
               'No',
-              style: TextStyle(color: AppColors.textSecondaryDark),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
           ),
           ElevatedButton(
@@ -85,7 +85,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.backgroundDark,
+          backgroundColor: const Color(0xFFF2F2F2),
           appBar: AppBar(
             backgroundColor: AppColors.sidebarBackground,
             elevation: 0,
@@ -115,14 +115,20 @@ class ToolReceiveDetailPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ── Tool identity card ───────────────────────────
+                          // ── Tool identity card ────────────────────────────
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceDark,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: AppColors.dividerDark),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Row(
                               children: [
@@ -131,7 +137,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
                                   height: 56,
                                   decoration: BoxDecoration(
                                     color: AppColors.primary
-                                        .withValues(alpha: 0.15),
+                                        .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(14),
                                   ),
                                   child: const Icon(
@@ -151,7 +157,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
                                         style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w700,
-                                          color: Colors.white,
+                                          color: AppColors.textPrimary,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -159,7 +165,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
                                         'RFID: ${tool.rfidTag}',
                                         style: const TextStyle(
                                           fontSize: 12,
-                                          color: AppColors.textSecondaryDark,
+                                          color: AppColors.textSecondary,
                                         ),
                                       ),
                                     ],
@@ -171,13 +177,13 @@ class ToolReceiveDetailPage extends StatelessWidget {
 
                           const SizedBox(height: 20),
 
-                          // ── Details card ─────────────────────────────────
+                          // ── Details card ──────────────────────────────────
                           const Text(
                             'Return Details',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondaryDark,
+                              color: AppColors.textSecondary,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -186,9 +192,15 @@ class ToolReceiveDetailPage extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceDark,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: AppColors.dividerDark),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Column(
                               children: [
@@ -224,75 +236,84 @@ class ToolReceiveDetailPage extends StatelessWidget {
                     ),
                   ),
 
-                  // ── Action buttons ────────────────────────────────────────
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: isLoading
-                                  ? null
-                                  : () => Navigator.of(context).pop(),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(
-                                  color: AppColors.dividerDark,
+                  // ── Bottom action bar ─────────────────────────────────────
+                  DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      border: Border(top: BorderSide(color: AppColors.divider)),
+                    ),
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () => Navigator.of(context).pop(),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: AppColors.grey300,
+                                  ),
+                                  foregroundColor: AppColors.textSecondary,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                foregroundColor: AppColors.textSecondaryDark,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            flex: 2,
-                            child: ElevatedButton(
-                              onPressed:
-                                  isLoading ? null : () => _onConfirm(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                disabledBackgroundColor: AppColors.grey700,
-                                foregroundColor: AppColors.onPrimary,
-                                elevation: 0,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              flex: 2,
+                              child: ElevatedButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () => _onConfirm(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  disabledBackgroundColor: AppColors.grey200,
+                                  foregroundColor: AppColors.onPrimary,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                              ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation(
-                                          AppColors.onPrimary,
+                                child: isLoading
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation(
+                                            AppColors.onPrimary,
+                                          ),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Confirm Receipt',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                    )
-                                  : const Text(
-                                      'Confirm Receipt',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -309,7 +330,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -319,7 +340,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: const BoxDecoration(
-                color: Color(0xFF1B3A1F),
+                color: AppColors.successContainer,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -332,7 +353,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
             const Text(
               'Receipt Confirmed!',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
@@ -342,7 +363,7 @@ class ToolReceiveDetailPage extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppColors.textSecondaryDark,
+                color: AppColors.textSecondary,
                 fontSize: 13,
                 height: 1.5,
               ),
@@ -352,9 +373,9 @@ class ToolReceiveDetailPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // close dialog
-                  Navigator.pop(context); // back to list
-                  bloc.add(const ReceiveToolListLoadRequested()); // refresh
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  bloc.add(const ReceiveToolListLoadRequested());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -391,14 +412,14 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
         children: [
-          Icon(icon, size: 16, color: AppColors.textSecondaryDark),
+          Icon(icon, size: 16, color: AppColors.textSecondary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
               style: const TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondaryDark,
+                color: AppColors.textSecondary,
               ),
             ),
           ),
@@ -407,7 +428,7 @@ class _DetailRow extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ],
@@ -420,6 +441,6 @@ class _RowDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Padding(
         padding: EdgeInsets.symmetric(vertical: 12),
-        child: Divider(color: AppColors.dividerDark, height: 1),
+        child: Divider(color: AppColors.divider, height: 1),
       );
 }

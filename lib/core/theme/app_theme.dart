@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:power_tool_tracking/core/constants/app_constants.dart';
 import 'package:power_tool_tracking/core/theme/app_colors.dart';
 import 'package:power_tool_tracking/core/theme/app_text_styles.dart';
@@ -19,8 +20,8 @@ class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      fontFamily: 'Poppins',
-      textTheme: _buildTextTheme(isDark),
+      fontFamily: GoogleFonts.poppins().fontFamily,
+      textTheme: GoogleFonts.poppinsTextTheme(_buildTextTheme(isDark)),
       appBarTheme: _buildAppBarTheme(isDark, colorScheme),
       cardTheme: _buildCardTheme(isDark),
       elevatedButtonTheme: _buildElevatedButtonTheme(colorScheme),

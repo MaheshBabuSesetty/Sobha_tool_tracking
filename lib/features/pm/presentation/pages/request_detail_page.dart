@@ -127,7 +127,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.backgroundDark,
+          backgroundColor: const Color(0xFFF2F2F2),
           appBar: AppBar(
             backgroundColor: AppColors.sidebarBackground,
             elevation: 0,
@@ -193,13 +193,13 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                 return const SizedBox.shrink();
               }
               final detail = state.detail;
-              final hasStock = detail.isActionable &&
-                  detail.items.any((i) => i.availableStock.isNotEmpty);
+              final canScan = detail.status == 'PM Approved';
+              final canIssue = _matchedItemIds.isNotEmpty;
               return _DetailBody(
                 detail: detail,
                 matchedItemIds: _matchedItemIds,
-                onScan: hasStock ? () => _openRfidScanner(detail) : null,
-                onIssue: hasStock ? () => _showIssuePicker(detail) : null,
+                onScan: canScan ? () => _openRfidScanner(detail) : null,
+                onIssue: canIssue ? () => _showIssuePicker(detail) : null,
               );
             },
           ),
@@ -223,133 +223,305 @@ class _DetailBody extends StatelessWidget {
   final Set<int> matchedItemIds;
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Summary card ────────────────────────────────────────
-                  _WhiteCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Request Summary',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) {
+    final totalItems = detail.items.fold(0, (s, i) => s + i.quantity);
+    final totalIssued = detail.items.fold(0, (s, i) => s + i.issued);
+    final totalRemaining = detail.items.fold(0, (s, i) => s + i.remaining);
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Summary card ────────────────────────────────────────────
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Request Summary',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const Spacer(),
+                          _PriorityChip(priority: detail.priority),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      const Divider(height: 1, color: AppColors.divider),
+                      const SizedBox(height: 14),
+                      _InfoRow(
+                        label: 'Request ID',
+                        value: detail.requestNumber,
+                      ),
+                      _InfoRow(label: 'Site', value: detail.siteName),
+                      _InfoRow(label: 'Status', value: detail.status),
+                      const SizedBox(height: 14),
+                      const Divider(height: 1, color: AppColors.divider),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          _StatBox(
+                            label: 'Total',
+                            value: '$totalItems',
                             color: AppColors.textPrimary,
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        _InfoRow(
-                            label: 'Request ID:',
-                            value: detail.requestNumber,),
-                        _InfoRow(label: 'Site:', value: detail.siteName),
-                        _InfoRow(label: 'Priority:', value: detail.priority),
-                        _InfoRow(label: 'Status:', value: detail.status),
-                      ],
-                    ),
+                          _StatBox(
+                            label: 'Issued',
+                            value: '$totalIssued',
+                            color: AppColors.success,
+                          ),
+                          _StatBox(
+                            label: 'Remaining',
+                            value: '$totalRemaining',
+                            color: totalRemaining > 0
+                                ? AppColors.warning
+                                : AppColors.success,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                  // ── Requested devices ───────────────────────────────────
-                  const Text(
-                    'Requested Devices',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                // ── Requested devices ────────────────────────────────────────
+                Row(
+                  children: [
+                    const Text(
+                      'Requested Devices',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...detail.items.map(
-                    (item) => _DeviceItem(
-                      item: item,
-                      isMatched: matchedItemIds.contains(item.itemId),
+                    const Spacer(),
+                    Text(
+                      '${detail.items.length} item${detail.items.length != 1 ? 's' : ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondaryDark,
+                      ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ...detail.items.map(
+                  (item) => _DeviceItem(
+                    item: item,
+                    isMatched: matchedItemIds.contains(item.itemId),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ),
 
-                  const SizedBox(height: 24),
-
-                  // ── Scan card ───────────────────────────────────────────
-                  _WhiteCard(
-                    child: Column(
-                      children: [
-                        const Text(
-                          'Manually scan each device one by one.\nStop scanning once done.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textSecondary,
-                            height: 1.6,
+        // ── Bottom action bar ──────────────────────────────────────────────
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: AppColors.divider),
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Row(
+                children: [
+                  // RFID scan button
+                  Tooltip(
+                    message: 'Scan RFID',
+                    child: InkWell(
+                      onTap: onScan,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: onScan != null
+                              ? AppColors.primary.withValues(alpha: 0.1)
+                              : AppColors.grey100,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: onScan != null
+                                ? AppColors.primary
+                                : AppColors.grey300,
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        GestureDetector(
-                          onTap: onScan,
-                          child: Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: onScan != null
-                                  ? AppColors.primary
-                                  : AppColors.grey300,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.wifi_tethering_rounded,
-                              color: onScan != null
-                                  ? Colors.white
-                                  : AppColors.grey500,
-                              size: 36,
-                            ),
-                          ),
+                        child: Icon(
+                          Icons.wifi_tethering_rounded,
+                          color: onScan != null
+                              ? AppColors.primary
+                              : AppColors.grey400,
+                          size: 24,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-
-                  const SizedBox(height: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: onIssue,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          disabledBackgroundColor: AppColors.grey200,
+                          foregroundColor: AppColors.onPrimary,
+                          disabledForegroundColor: AppColors.grey500,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send_rounded, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Issue Tool',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
 
-          // ── Issue Tool button ─────────────────────────────────────────
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: onIssue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: AppColors.grey300,
-                    foregroundColor: AppColors.onPrimary,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Issue Tool',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+class _PriorityChip extends StatelessWidget {
+  const _PriorityChip({required this.priority});
+  final String priority;
+
+  @override
+  Widget build(BuildContext context) {
+    final (bg, fg) = switch (priority.toLowerCase()) {
+      'high' => (AppColors.errorContainer, AppColors.error),
+      'medium' => (AppColors.warningContainer, AppColors.warning),
+      _ => (AppColors.grey100, AppColors.grey600),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        priority,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: fg,
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 90,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
+class _StatBox extends StatelessWidget {
+  const _StatBox({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       );
 }
 
@@ -362,82 +534,235 @@ class _DeviceItem extends StatelessWidget {
   final bool isMatched;
 
   @override
-  Widget build(BuildContext context) => AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isMatched ? AppColors.primaryContainer : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: isMatched
-              ? Border.all(color: AppColors.primary, width: 2)
-              : Border.all(color: Colors.transparent, width: 2),
-          boxShadow: isMatched
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
+  Widget build(BuildContext context) {
+    final available = item.availableStock.length;
+    final hasStock = available > 0;
+    final fulfilled = item.remaining == 0;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      margin: EdgeInsets.only(
+        bottom: 10,
+        left: isMatched ? 0 : 0,
+      ),
+      decoration: BoxDecoration(
+        color: isMatched
+            ? AppColors.primary.withValues(alpha: 0.04)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isMatched ? AppColors.primary : AppColors.divider,
+          width: isMatched ? 2 : 1,
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.description,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isMatched
-                          ? AppColors.onPrimaryContainer
-                          : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Requested Qty: ${item.quantity}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isMatched
-                          ? AppColors.primaryDark
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isMatched)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
+        boxShadow: isMatched
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                  blurRadius: 16,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.check_circle_rounded,
-                        size: 12, color: AppColors.onPrimary,),
-                    SizedBox(width: 4),
-                    Text(
-                      'Matched',
+              ]
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+      ),
+      child: Column(
+        children: [
+          // ── Top row: icon + name + badges ─────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isMatched
+                        ? AppColors.primary.withValues(alpha: 0.12)
+                        : AppColors.grey100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.build_rounded,
+                    size: 20,
+                    color:
+                        isMatched ? AppColors.primary : AppColors.grey500,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    item.description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                if (isMatched)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.wifi_tethering_rounded,
+                          size: 10,
+                          color: AppColors.onPrimary,
+                        ),
+                        SizedBox(width: 3),
+                        Text(
+                          'RFID',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (fulfilled)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.successContainer,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Fulfilled',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.onPrimary,
+                        color: AppColors.success,
                       ),
                     ),
-                  ],
+                  ),
+              ],
+            ),
+          ),
+
+          // ── Divider ───────────────────────────────────────────────
+          const Divider(height: 1, color: AppColors.divider),
+
+          // ── Bottom row: stats + availability ──────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+            child: Row(
+              children: [
+                _DeviceStat(
+                  label: 'Requested',
+                  value: '${item.quantity}',
+                  color: AppColors.textPrimary,
                 ),
+                _DeviceStat(
+                  label: 'Issued',
+                  value: '${item.issued}',
+                  color:
+                      item.issued > 0 ? AppColors.success : AppColors.grey500,
+                ),
+                _DeviceStat(
+                  label: 'Remaining',
+                  value: '${item.remaining}',
+                  color: item.remaining > 0
+                      ? AppColors.warning
+                      : AppColors.success,
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: hasStock
+                        ? AppColors.successContainer
+                        : AppColors.grey100,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '$available',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: hasStock
+                              ? AppColors.success
+                              : AppColors.grey500,
+                        ),
+                      ),
+                      Text(
+                        'In Stock',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: hasStock
+                              ? AppColors.success
+                              : AppColors.grey500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeviceStat extends StatelessWidget {
+  const _DeviceStat({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: color,
               ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       );
@@ -477,59 +802,7 @@ class _ErrorBody extends StatelessWidget {
       );
 }
 
-// ── Shared widgets ───────────────────────────────────────────────────────────
 
-class _WhiteCard extends StatelessWidget {
-  const _WhiteCard({required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: child,
-      );
-}
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 110,
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-}
 
 // ── Issue picker sheet ───────────────────────────────────────────────────────
 
