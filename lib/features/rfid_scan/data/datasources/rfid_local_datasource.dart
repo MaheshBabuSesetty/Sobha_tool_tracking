@@ -1,6 +1,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:power_tool_tracking/core/errors/app_exception.dart';
@@ -29,6 +30,7 @@ class RfidLocalDatasourceImpl implements RfidLocalDatasource {
   Stream<dynamic>? _broadcastStream;
 
   Stream<dynamic> get _eventStream {
+    if (!Platform.isAndroid) return const Stream.empty();
     _broadcastStream ??=
         _eventChannel.receiveBroadcastStream().asBroadcastStream();
     return _broadcastStream!;
@@ -36,6 +38,11 @@ class RfidLocalDatasourceImpl implements RfidLocalDatasource {
 
   @override
   Future<bool> initialize() async {
+    if (!Platform.isAndroid) {
+      throw const RfidInitializationException(
+        message: 'RFID hardware is only supported on Android',
+      );
+    }
     try {
       final result = await _methodChannel.invokeMethod<bool>('initialize');
       return result ?? false;

@@ -26,8 +26,10 @@ import 'package:power_tool_tracking/features/auth/domain/usecases/check_auth_use
 import 'package:power_tool_tracking/features/auth/domain/usecases/login_usecase.dart';
 import 'package:power_tool_tracking/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:power_tool_tracking/features/auth/domain/usecases/refresh_token_usecase.dart';
+import 'package:power_tool_tracking/features/pm/domain/usecases/confirm_tool_receipt_usecase.dart';
 import 'package:power_tool_tracking/features/pm/domain/usecases/get_pm_request_detail_usecase.dart';
 import 'package:power_tool_tracking/features/pm/domain/usecases/get_pm_requests_usecase.dart';
+import 'package:power_tool_tracking/features/pm/domain/usecases/get_tools_to_receive_usecase.dart';
 import 'package:power_tool_tracking/features/pm/domain/usecases/pm_issue_tool_usecase.dart';
 import 'package:power_tool_tracking/features/tools/domain/usecases/checkin_tool_usecase.dart';
 import 'package:power_tool_tracking/features/tools/domain/usecases/checkout_tool_usecase.dart';
@@ -40,6 +42,7 @@ import 'package:power_tool_tracking/features/tools/domain/usecases/update_tool_u
 import 'package:power_tool_tracking/presentation/blocs/app/app_bloc.dart';
 import 'package:power_tool_tracking/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:power_tool_tracking/features/pm/presentation/blocs/pm_bloc.dart';
+import 'package:power_tool_tracking/features/pm/presentation/blocs/receive_tool_bloc.dart';
 import 'package:power_tool_tracking/presentation/blocs/theme/theme_bloc.dart';
 import 'package:power_tool_tracking/features/tools/presentation/blocs/tool_bloc.dart';
 
@@ -135,6 +138,10 @@ void _registerUseCases() {
         () => GetPmRequestDetailUseCase(sl<PmRepository>()))
     ..registerLazySingleton<PmIssueToolUseCase>(
         () => PmIssueToolUseCase(sl<PmRepository>()))
+    ..registerLazySingleton<GetToolsToReceiveUseCase>(
+        () => GetToolsToReceiveUseCase(sl<PmRepository>()))
+    ..registerLazySingleton<ConfirmToolReceiptUseCase>(
+        () => ConfirmToolReceiptUseCase(sl<PmRepository>()))
     // Tool use cases
     ..registerLazySingleton<GetToolsUseCase>(() => GetToolsUseCase(sl<ToolRepository>()))
     ..registerLazySingleton<GetToolByIdUseCase>(() => GetToolByIdUseCase(sl<ToolRepository>()))
@@ -161,6 +168,12 @@ void _registerBlocs() {
         getRequests: sl<GetPmRequestsUseCase>(),
         getRequestDetail: sl<GetPmRequestDetailUseCase>(),
         issueTool: sl<PmIssueToolUseCase>(),
+      ),
+    )
+    ..registerFactory<ReceiveToolBloc>(
+      () => ReceiveToolBloc(
+        getToolsToReceive: sl<GetToolsToReceiveUseCase>(),
+        confirmReceipt: sl<ConfirmToolReceiptUseCase>(),
       ),
     )
     ..registerFactory<ThemeBloc>(ThemeBloc.new)

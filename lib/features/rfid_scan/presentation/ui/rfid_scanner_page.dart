@@ -130,7 +130,12 @@ class _RfidScannerPageState extends State<RfidScannerPage> {
           body: BlocConsumer<RfidBloc, RfidState>(
             listenWhen: (prev, curr) => curr.tags.length > prev.tags.length,
             listener: (_, state) {
-              if (state.tags.isNotEmpty) _onTagReceived(state.tags.last);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                for (final tag in state.tags) {
+                  _onTagReceived(tag);
+                }
+              });
             },
             builder: (context, state) => Column(
               children: [

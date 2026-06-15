@@ -1,0 +1,14 @@
+import 'package:power_tool_tracking/core/utils/result.dart';
+import 'package:power_tool_tracking/features/pm/domain/entities/pm_request_entity.dart';
+import 'package:power_tool_tracking/features/pm/domain/repositories/pm_repository.dart';
+
+class ScanRfidUseCase {
+  const ScanRfidUseCase(this._repository);
+  final PmRepository _repository;
+
+  Future<Result<RfidScanResultEntity>> call({
+    required String code,
+    required int requestId,
+  }) =>
+      _repository.scanRfid(code: code, requestId: requestId);
+}

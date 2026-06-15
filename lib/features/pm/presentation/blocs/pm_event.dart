@@ -32,3 +32,17 @@ class PmIssueToolRequested extends PmEvent {
   @override
   List<Object?> get props => [requestId, toolId, remarks];
 }
+
+class PmScanAndIssueRequested extends PmEvent {
+  const PmScanAndIssueRequested({
+    required this.rfidCode,
+    required this.requestId,
+    required this.availableStocks,
+  });
+  final String rfidCode;
+  final int requestId;
+  final List<AvailableStockEntity> availableStocks;
+
+  @override
+  List<Object?> get props => [rfidCode, requestId, availableStocks];
+}

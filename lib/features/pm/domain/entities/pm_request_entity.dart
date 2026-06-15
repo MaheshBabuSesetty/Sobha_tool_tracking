@@ -84,6 +84,50 @@ class AvailableStockEntity {
   final String condition;
 }
 
+class RfidScanMatchEntity {
+  const RfidScanMatchEntity({
+    required this.id,
+    required this.rfidTag,
+    required this.serialNumber,
+    required this.condition,
+  });
+
+  final int id;
+  final String rfidTag;
+  final String serialNumber;
+  final String condition;
+}
+
+class ToolToReceiveEntity {
+  const ToolToReceiveEntity({
+    required this.toolId,
+    required this.rfidTag,
+    required this.toolName,
+    required this.returnedFrom,
+    required this.returnedBy,
+    required this.returnedAt,
+    required this.movementId,
+  });
+
+  final int toolId;
+  final String rfidTag;
+  final String toolName;
+  final String returnedFrom;
+  final String returnedBy;
+  final DateTime returnedAt;
+  final int movementId;
+}
+
+class ReceiptConfirmEntity {
+  const ReceiptConfirmEntity({required this.message});
+  final String message;
+}
+
+class RfidScanResultEntity {
+  const RfidScanResultEntity({this.matchesRequestItem});
+  final RfidScanMatchEntity? matchesRequestItem;
+}
+
 class ActionResponseEntity {
   const ActionResponseEntity({
     required this.message,

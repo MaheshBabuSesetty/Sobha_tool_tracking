@@ -22,4 +22,7 @@ class RouteNames {
   static const String settings = '/home/settings';
   static const String profile = '/home/profile';
   static const String changePassword = '/home/settings/change-password';
+  static const String storeDashboard = '/home/store';
+  static const String toolsToReceive = '/home/store/receive';
+  static const String toolReceiveDetail = '/home/store/receive/:id';
 }

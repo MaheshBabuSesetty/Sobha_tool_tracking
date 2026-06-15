@@ -22,6 +22,7 @@ class PmBloc extends Bloc<PmEvent, PmState> {
     on<PmRequestsLoadRequested>(_onRequestsLoad, transformer: droppable());
     on<PmRequestDetailLoadRequested>(_onDetailLoad, transformer: droppable());
     on<PmIssueToolRequested>(_onIssueTool, transformer: droppable());
+    on<PmScanAndIssueRequested>(_onScanAndIssue, transformer: sequential());
   }
 
   final GetPmRequestsUseCase _getRequests;
@@ -71,11 +72,45 @@ class PmBloc extends Bloc<PmEvent, PmState> {
     result.fold(
       onSuccess: (response) {
         AppLogger.info(
-            'Tool issued: ${response.message} (req: ${event.requestId})');
+          'Tool issued: ${response.message} (req: ${event.requestId})',
+        );
         emit(PmActionSuccess(response: response, requestId: event.requestId));
       },
       onFailure: (failure) {
         AppLogger.warning('PM issue tool failed: ${failure.message}');
+        emit(PmError(failure.message));
+      },
+    );
+  }
+
+  Future<void> _onScanAndIssue(
+    PmScanAndIssueRequested event,
+    Emitter<PmState> emit,
+  ) async {
+    emit(const PmLoading());
+
+    final match = event.availableStocks.where(
+      (s) => s.rfidTag == event.rfidCode,
+    ).firstOrNull;
+
+    if (match == null) {
+      AppLogger.info('RFID scan: no match for ${event.rfidCode}');
+      emit(const PmScanNoMatch());
+      return;
+    }
+
+    AppLogger.info('RFID scan matched tool ${match.id}, issuing...');
+    final issueResult = await _issueTool(
+      requestId: event.requestId,
+      toolId: match.id,
+    );
+    issueResult.fold(
+      onSuccess: (response) {
+        AppLogger.info('Auto-issued via RFID: ${response.message}');
+        emit(PmActionSuccess(response: response, requestId: event.requestId));
+      },
+      onFailure: (failure) {
+        AppLogger.warning('Auto-issue failed: ${failure.message}');
         emit(PmError(failure.message));
       },
     );

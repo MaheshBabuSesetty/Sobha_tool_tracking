@@ -17,6 +17,13 @@ class PmRepositoryImpl implements PmRepository {
       dataSource.getPmRequestDetail(id);
 
   @override
+  Future<Result<RfidScanResultEntity>> scanRfid({
+    required String code,
+    required int requestId,
+  }) =>
+      dataSource.scanRfid(code: code, requestId: requestId);
+
+  @override
   Future<Result<ActionResponseEntity>> issueTool({
     required int requestId,
     required int toolId,
@@ -27,4 +34,12 @@ class PmRepositoryImpl implements PmRepository {
         toolId: toolId,
         remarks: remarks,
       );
+
+  @override
+  Future<Result<List<ToolToReceiveEntity>>> getToolsToReceive() =>
+      dataSource.getToolsToReceive();
+
+  @override
+  Future<Result<ReceiptConfirmEntity>> confirmToolReceipt(int movementId) =>
+      dataSource.confirmToolReceipt(movementId);
 }

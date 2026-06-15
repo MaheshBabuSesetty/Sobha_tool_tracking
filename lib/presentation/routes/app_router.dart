@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:power_tool_tracking/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:power_tool_tracking/features/auth/presentation/pages/login_page.dart';
+import 'package:power_tool_tracking/features/auth/presentation/pages/splash_page.dart';
 import 'package:power_tool_tracking/features/home/presentation/pages/dashboard_page.dart';
 import 'package:power_tool_tracking/features/home/presentation/pages/home_page.dart';
 import 'package:power_tool_tracking/features/pm/presentation/pages/issue_tool_page.dart';
 import 'package:power_tool_tracking/features/pm/presentation/pages/request_detail_page.dart';
+import 'package:power_tool_tracking/features/pm/presentation/pages/store_dashboard_page.dart';
 import 'package:power_tool_tracking/features/profile/presentation/pages/profile_page.dart';
-import 'package:power_tool_tracking/features/auth/presentation/pages/splash_page.dart';
 import 'package:power_tool_tracking/features/tools/presentation/pages/add_edit_tool_page.dart';
 import 'package:power_tool_tracking/features/tools/presentation/pages/tool_detail_page.dart';
 import 'package:power_tool_tracking/features/tools/presentation/pages/tools_page.dart';
@@ -54,8 +55,10 @@ class AppRouter {
                   GoRoute(
                     path: ':id',
                     name: 'issue-tool-detail',
-                    builder: (_, state) => RequestDetailPage(
-                      requestId: state.pathParameters['id']!,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: RequestDetailPage(
+                        requestId: state.pathParameters['id']!,
+                      ),
                     ),
                   ),
                 ],
@@ -92,6 +95,11 @@ class AppRouter {
                 path: RouteNames.scan,
                 name: 'scan',
                 builder: (_, __) => const _PlaceholderPage(title: 'Scan'),
+              ),
+              GoRoute(
+                path: RouteNames.storeDashboard,
+                name: 'store-dashboard',
+                builder: (_, __) => const StoreDashboardPage(),
               ),
               GoRoute(
                 path: RouteNames.profile,
@@ -131,9 +139,15 @@ class AppRouter {
     final isSplash = state.matchedLocation == RouteNames.splash;
     final isLogin = state.matchedLocation == RouteNames.login;
 
-    if (isSplash) return null;
-    if (!isAuthenticated && !isLogin) return RouteNames.login;
-    if (isAuthenticated && isLogin) return RouteNames.dashboard;
+    if (isSplash) {
+      return null;
+    }
+    if (!isAuthenticated && !isLogin) {
+      return RouteNames.login;
+    }
+    if (isAuthenticated && isLogin) {
+      return RouteNames.dashboard;
+    }
     return null;
   }
 

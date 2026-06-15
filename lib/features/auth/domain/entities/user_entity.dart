@@ -28,12 +28,15 @@ class UserEntity extends Equatable {
   bool get isAdmin => role == 'admin' || role == 'super_admin';
   bool get isManager => role == 'manager' || isAdmin;
   bool get isTechnician => role == 'technician';
+  bool get isProjectStore => role == 'project_store';
 
   bool hasPermission(String permission) => permissions.contains(permission);
 
   String get initials {
     final parts = name.split(' ');
-    if (parts.length >= 2) return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
     return name.isNotEmpty ? name[0].toUpperCase() : '?';
   }
 

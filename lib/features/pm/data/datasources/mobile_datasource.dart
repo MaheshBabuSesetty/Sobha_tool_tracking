@@ -26,6 +26,36 @@ class MobileDataSource {
             _parsePmRequestDetail(json as Map<String, dynamic>),
       );
 
+  Future<Result<RfidScanResultEntity>> scanRfid({
+    required String code,
+    required int requestId,
+  }) =>
+      apiClient.get<RfidScanResultEntity>(
+        ApiConstants.mobileScan,
+        queryParams: {'code': code, 'request_id': requestId},
+        fromJson: (json) => _parseScanResult(json as Map<String, dynamic>),
+      );
+
+  Future<Result<List<ToolToReceiveEntity>>> getToolsToReceive() =>
+      apiClient.get<List<ToolToReceiveEntity>>(
+        ApiConstants.mobilePmToReceive,
+        fromJson: (json) {
+          final items = (json as Map<String, dynamic>)['items'] as List;
+          return items
+              .map((e) => _parseToolToReceive(e as Map<String, dynamic>))
+              .toList();
+        },
+      );
+
+  Future<Result<ReceiptConfirmEntity>> confirmToolReceipt(int movementId) =>
+      apiClient.post<ReceiptConfirmEntity>(
+        ApiConstants.mobilePmReceive,
+        data: {'movement_id': movementId},
+        fromJson: (json) => ReceiptConfirmEntity(
+          message: (json as Map<String, dynamic>)['message'] as String,
+        ),
+      );
+
   Future<Result<ActionResponseEntity>> issueTool({
     required int requestId,
     required int toolId,
@@ -87,6 +117,34 @@ class MobileDataSource {
         rfidTag: j['rfid_tag'] as String,
         serialNumber: j['serial_number'] as String,
         condition: j['condition'] as String,
+      );
+
+  RfidScanResultEntity _parseScanResult(Map<String, dynamic> j) {
+    final match = j['matches_request_item'];
+    return RfidScanResultEntity(
+      matchesRequestItem: match == null
+          ? null
+          : _parseScanMatch(match as Map<String, dynamic>),
+    );
+  }
+
+  RfidScanMatchEntity _parseScanMatch(Map<String, dynamic> j) =>
+      RfidScanMatchEntity(
+        id: j['id'] as int,
+        rfidTag: j['rfid_tag'] as String,
+        serialNumber: j['serial_number'] as String,
+        condition: j['condition'] as String,
+      );
+
+  ToolToReceiveEntity _parseToolToReceive(Map<String, dynamic> j) =>
+      ToolToReceiveEntity(
+        toolId: j['tool_id'] as int,
+        rfidTag: j['rfid_tag'] as String,
+        toolName: j['tool_name'] as String,
+        returnedFrom: j['returned_from'] as String,
+        returnedBy: j['returned_by'] as String,
+        returnedAt: DateTime.parse(j['returned_at'] as String),
+        movementId: j['movement_id'] as int,
       );
 
   ActionResponseEntity _parseActionResponse(Map<String, dynamic> j) =>

@@ -40,6 +40,10 @@ class PmActionSuccess extends PmState {
   List<Object?> get props => [response, requestId];
 }
 
+class PmScanNoMatch extends PmState {
+  const PmScanNoMatch();
+}
+
 class PmError extends PmState {
   const PmError(this.message);
   final String message;

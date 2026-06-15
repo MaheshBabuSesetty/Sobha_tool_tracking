@@ -20,6 +20,9 @@ class ApiConstants {
   static const String mobilePmRequests = '/mobile/pm/requests';
   static String mobilePmRequestById(int id) => '/mobile/pm/requests/$id';
   static const String mobilePmIssue = '/mobile/pm/issue';
+  static const String mobilePmToReceive = '/mobile/pm/to-receive';
+  static const String mobilePmReceive = '/mobile/pm/receive';
+  static const String mobileScan = '/scan';
 
   // Auth Endpoints
   static const String login = '/api/v1/auth/login';

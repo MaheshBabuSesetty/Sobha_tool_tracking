@@ -57,23 +57,21 @@ class RfidBottomActionBar extends StatelessWidget {
           ),
           if (showDoneButton) ...[
             const SizedBox(width: 12),
-            SizedBox(
-              height: 50,
-              child: OutlinedButton(
-                onPressed: canDone ? onDone : null,
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: canDone ? AppColors.primary : AppColors.grey300,
-                  ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+            OutlinedButton(
+              onPressed: canDone ? onDone : null,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, 50),
+                side: BorderSide(
+                  color: canDone ? AppColors.primary : AppColors.grey300,
                 ),
-                child: Text(
-                  'Done ($newTagCount)',
-                  style: TextStyle(
-                    color: canDone ? AppColors.primary : AppColors.grey400,
-                    fontWeight: FontWeight.w600,
-                  ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
+              child: Text(
+                'Done ($newTagCount)',
+                style: TextStyle(
+                  color: canDone ? AppColors.primary : AppColors.grey400,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
