@@ -35,13 +35,6 @@ dependencies:
   # Navigation
   go_router: ^17.3.0
 
-  # Firebase
-  firebase_core: ^4.10.0
-  firebase_analytics: ^12.4.2
-  firebase_crashlytics: ^5.2.3
-  firebase_messaging: ^16.3.0
-  firebase_remote_config: ^6.5.2
-
   # Environment Configuration
   flutter_dotenv: ^6.0.1
 

@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.android.server.bcr.IBCRService
 import com.nlscan.android.uhf.TagInfo
 import com.nlscan.android.uhf.UHFCommonParams
 import com.nlscan.android.uhf.UHFManager
@@ -39,8 +40,8 @@ class RfidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.
 
     companion object {
         private const val TAG = "RfidPlugin"
-        private const val METHOD_CHANNEL = "com.flexgate/rfid_method"
-        private const val EVENT_CHANNEL = "com.flexgate/rfid_event"
+        private const val METHOD_CHANNEL = "com.sobha.rfid.tool.tracking/rfid_method"
+        private const val EVENT_CHANNEL = "com.sobha.rfid.tool.tracking/rfid_event"
 
         // Newland UHF broadcast actions
         private const val TAG_BROADCAST = "nlscan.intent.action.uhf.ACTION_RESULT"
@@ -143,6 +144,13 @@ class RfidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         context = binding.applicationContext
+
+        // Open the BCR system service before getting UHFManager so that
+        // UHFManager.initObject() can successfully retrieve the UHF sub-service
+        // via IBCRService.getUHFService(). Without this, getUHFService() returns
+        // null on some Newland devices and every UHF call NPEs.
+        openBcrService()
+
         uhfManager = UHFManager.getInstance()
 
         methodChannel = MethodChannel(binding.binaryMessenger, METHOD_CHANNEL).apply {
@@ -241,6 +249,31 @@ class RfidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.
         eventSink = null
         unregisterTagReceiver()
         Log.d(TAG, "Event channel listener unregistered")
+    }
+
+    /**
+     * Opens the Newland BCR system service so that UHFManager.initObject()
+     * can successfully call IBCRService.getUHFService() later.
+     *
+     * ServiceManager is a hidden API so we access it via reflection.
+     */
+    private fun openBcrService() {
+        try {
+            val serviceManagerCls = Class.forName("android.os.ServiceManager")
+            val getServiceMethod = serviceManagerCls.getMethod("getService", String::class.java)
+            val binder = getServiceMethod.invoke(null, "bcr_service") as? android.os.IBinder
+
+            if (binder == null) {
+                Log.w(TAG, "BCR service not found — device may not have Newland UHF hardware")
+                return
+            }
+
+            val bcrService = IBCRService.Stub.asInterface(binder)
+            val opened = bcrService?.open() ?: false
+            Log.d(TAG, "BCR service open(): $opened")
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not pre-open BCR service: ${e.message}")
+        }
     }
 
     /**

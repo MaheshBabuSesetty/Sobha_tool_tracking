@@ -6,9 +6,11 @@
 
     <application
         android:label="${applicationLabel}"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
+
+        <!-- Newland BCR/UHF shared library — required="false" so non-Newland devices still install -->
+        <uses-library android:name="com.android.server.bcr" android:required="false" />
 
         <activity
             android:name=".MainActivity"
@@ -27,15 +29,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <!-- Firebase Cloud Messaging -->
-        <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
 
         <!-- Flutter v2 embedding -->
         <meta-data
